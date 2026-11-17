@@ -1,1 +1,111 @@
 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jarvis AI Assistant</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #07111f;
+      color: #00eaff;
+      text-align: center;
+      padding: 30px 15px;
+    }
+    .container {
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 25px;
+      border: 1px solid #00eaff;
+      border-radius: 18px;
+      box-shadow: 0 0 20px #00eaff55;
+    }
+    h1 { font-size: 32px; }
+    p { color: #d7eaff; }
+    input {
+      width: 90%;
+      padding: 13px;
+      border-radius: 8px;
+      border: none;
+      margin: 15px 0;
+      font-size: 16px;
+    }
+    button {
+      padding: 12px 20px;
+      margin: 6px;
+      border: none;
+      border-radius: 8px;
+      background: #00eaff;
+      color: #07111f;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    #reply {
+      margin-top: 20px;
+      color: white;
+      min-height: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🤖 JARVIS AI</h1>
+    <p>Your Personal Assistant</p>
+
+    <input id="question" type="text"
+      placeholder="Ask me something...">
+
+    <br>
+    <button onclick="askJarvis()">Ask Jarvis</button>
+    <button onclick="startListening()">🎤 Speak</button>
+
+    <p id="reply">Hello! I am Jarvis.</p>
+  </div>
+
+  <script>
+    function askJarvis() {
+      const question = document.getElementById("question").value;
+      const reply = document.getElementById("reply");
+
+      if (!question.trim()) {
+        reply.innerText = "Please type something.";
+        return;
+      }
+
+      const answer = "You said: " + question;
+      reply.innerText = answer;
+      speak(answer);
+    }
+
+    function speak(text) {
+      const speech = new SpeechSynthesisUtterance(text);
+      speech.lang = "en-US";
+      speechSynthesis.speak(speech);
+    }
+
+    function startListening() {
+      const Recognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+      if (!Recognition) {
+        document.getElementById("reply").innerText =
+          "Voice recognition is not supported in this browser.";
+        return;
+      }
+
+      const recognition = new Recognition();
+      recognition.lang = "en-US";
+      recognition.onresult = function(event) {
+        document.getElementById("question").value =
+          event.results[0][0].transcript;
+        askJarvis();
+      };
+      recognition.start();
+    }
+  </script>
+</body>
+</html>
