@@ -1,64 +1,75 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jarvis AI Assistant</title>
+  <title>JARVIS AI</title>
+
   <style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
       background: #07111f;
       color: #00eaff;
+      font-family: Arial, sans-serif;
       text-align: center;
-      padding: 30px 15px;
+      padding: 25px 12px;
     }
-    .container {
+
+    .box {
       max-width: 500px;
-      margin: 40px auto;
-      padding: 25px;
+      margin: 35px auto;
+      padding: 25px 15px;
       border: 1px solid #00eaff;
       border-radius: 18px;
-      box-shadow: 0 0 20px #00eaff55;
+      box-shadow: 0 0 18px #00eaff55;
     }
-    h1 { font-size: 32px; }
-    p { color: #d7eaff; }
+
+    h1 {
+      font-size: 36px;
+    }
+
     input {
       width: 90%;
       padding: 13px;
+      margin: 15px 0;
       border-radius: 8px;
       border: none;
-      margin: 15px 0;
       font-size: 16px;
+      box-sizing: border-box;
     }
+
     button {
-      padding: 12px 20px;
+      padding: 12px 18px;
       margin: 6px;
       border: none;
       border-radius: 8px;
       background: #00eaff;
       color: #07111f;
-      font-weight: bold;
       font-size: 16px;
+      font-weight: bold;
     }
+
     #reply {
-      margin-top: 20px;
       color: white;
-      min-height: 30px;
+      margin-top: 25px;
+      min-height: 35px;
     }
   </style>
 </head>
+
 <body>
-  <div class="container">
-    <h1>🤖 JARVIS AI</h1>
+  <div class="box">
+    <h1>🤖 JARVIS</h1>
     <p>Your Personal Assistant</p>
 
-    <input id="question" type="text"
-      placeholder="Ask me something...">
+    <input
+      id="question"
+      type="text"
+      placeholder="Type your message..."
+    >
 
     <br>
+
     <button onclick="askJarvis()">Ask Jarvis</button>
     <button onclick="startListening()">🎤 Speak</button>
 
@@ -66,24 +77,56 @@
   </div>
 
   <script>
-    function askJarvis() {
-      const question = document.getElementById("question").value;
-      const reply = document.getElementById("reply");
+    function speak(message) {
+      if (!("speechSynthesis" in window)) {
+        document.getElementById("reply").innerText =
+          "Speech is not supported in this browser.";
+        return;
+      }
 
-      if (!question.trim()) {
+      window.speechSynthesis.cancel();
+
+      const speech = new SpeechSynthesisUtterance(message);
+      speech.lang = "en-IN";
+      speech.rate = 1;
+      window.speechSynthesis.speak(speech);
+    }
+
+    function askJarvis() {
+      const input = document.getElementById("question");
+      const reply = document.getElementById("reply");
+      const question = input.value.trim().toLowerCase();
+
+      if (!question) {
         reply.innerText = "Please type something.";
         return;
       }
 
-      const answer = "You said: " + question;
+      let answer;
+
+      if (
+        question.includes("hi") ||
+        question.includes("hello") ||
+        question.includes("హాయ్") ||
+        question.includes("హలో")
+      ) {
+        answer = "Hello! I am Jarvis. How can I help you?";
+      } else if (
+        question.includes("your name") ||
+        question.includes("నీ పేరు")
+      ) {
+        answer = "My name is Jarvis.";
+      } else if (
+        question.includes("how are you") ||
+        question.includes("ఎలా ఉన్నావు")
+      ) {
+        answer = "I am fine. Thank you!";
+      } else {
+        answer = "You said: " + input.value;
+      }
+
       reply.innerText = answer;
       speak(answer);
-    }
-
-    function speak(text) {
-      const speech = new SpeechSynthesisUtterance(text);
-      speech.lang = "en-US";
-      speechSynthesis.speak(speech);
     }
 
     function startListening() {
@@ -91,22 +134,35 @@
         window.SpeechRecognition ||
         window.webkitSpeechRecognition;
 
+      const reply = document.getElementById("reply");
+
       if (!Recognition) {
-        document.getElementById("reply").innerText =
-          "Voice recognition is not supported in this browser.";
+        reply.innerText =
+          "Voice recognition is not supported. Try Chrome.";
         return;
       }
 
       const recognition = new Recognition();
-      recognition.lang = "en-US";
+      recognition.lang = "en-IN";
+      recognition.interimResults = false;
+
+      recognition.onstart = function() {
+        reply.innerText = "Listening...";
+      };
+
       recognition.onresult = function(event) {
         document.getElementById("question").value =
           event.results[0][0].transcript;
         askJarvis();
       };
+
+      recognition.onerror = function() {
+        reply.innerText =
+          "Microphone error. Please check microphone permission.";
+      };
+
       recognition.start();
     }
   </script>
-  ``window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;`
 </body>
 </html>
